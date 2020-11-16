@@ -17,7 +17,6 @@ public class SortingTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     private final TournamentStats tournamentStats = new TournamentStats();
-    private final Scanner scanner = new Scanner(System.in);
     private final File statsFile = new File("stats.csv");
 
     @Test
@@ -26,6 +25,7 @@ public class SortingTest {
         // given
         provideInput("Jan Kowalski 425", "Maria Zawadzka 234", "STOP", "1", "2");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -46,6 +46,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "1", "1");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -57,7 +58,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777");
+                .containsSubsequence("Adam Zaręba;555", "Barbara Woźniak;333", "Cezary Abacki;777");
     }
 
     @Test
@@ -66,6 +67,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "1", "2");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -77,7 +79,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Cezary Abacki 777", "Barbara Woźniak 333", "Adam Zaręba 555");
+                .containsSubsequence("Cezary Abacki;777", "Barbara Woźniak;333", "Adam Zaręba;555");
     }
 
     @Test
@@ -86,6 +88,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "2", "1");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -97,7 +100,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Cezary Abacki 777", "Barbara Woźniak 333", "Adam Zaręba 555");
+                .containsSubsequence("Cezary Abacki;777", "Barbara Woźniak;333", "Adam Zaręba;555");
     }
 
     @Test
@@ -106,6 +109,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "2", "2");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -117,7 +121,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777");
+                .containsSubsequence("Adam Zaręba;555", "Barbara Woźniak;333", "Cezary Abacki;777");
     }
 
     @Test
@@ -126,6 +130,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "3", "1");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -137,7 +142,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Barbara Woźniak 333", "Adam Zaręba 555", "Cezary Abacki 777");
+                .containsSubsequence("Barbara Woźniak;333", "Adam Zaręba;555", "Cezary Abacki;777");
     }
 
     @Test
@@ -146,6 +151,7 @@ public class SortingTest {
         // given
         provideInput("Adam Zaręba 555", "Barbara Woźniak 333", "Cezary Abacki 777", "STOP", "3", "2");
         statsFile.delete();
+        Scanner scanner = new Scanner(System.in);
 
         // when
         tournamentStats.run(scanner);
@@ -157,7 +163,7 @@ public class SortingTest {
         List<String> lines = Files.readAllLines(statsFile.toPath());
         assertThat(lines)
                 .as("Plik nie zawiera wpisów w odpowiedniej kolejności.")
-                .containsSubsequence("Cezary Abacki 777", "Adam Zaręba 555", "Barbara Woźniak 333");
+                .containsSubsequence("Cezary Abacki;777", "Adam Zaręba;555", "Barbara Woźniak;333");
     }
 
     @BeforeEach
@@ -173,6 +179,7 @@ public class SortingTest {
 
     private void provideInput(String... lines) {
         String input = String.join("\r\n", lines);
+        input += "\r\n";
 
         ByteArrayInputStream testIn = new ByteArrayInputStream(input.getBytes());
         System.setIn(testIn);
