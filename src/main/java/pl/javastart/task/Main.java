@@ -8,6 +8,7 @@ public class Main {
         TournamentStats tournamentStats = new TournamentStats();
         Scanner scanner = new Scanner(System.in);
         tournamentStats.run(scanner);
+
     }
 
 }
