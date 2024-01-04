@@ -1,7 +1,5 @@
 package pl.javastart.task;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -14,38 +12,43 @@ public class TournamentStats {
     private static final int ASCENDING_SORTING = 1;
     private static final int DESCENDING_SORTING = 2;
     private List<Person> participants = new ArrayList<>();
-
+    private Scanner scanner = new Scanner(System.in);
     private String fileName = "stats.csv";
 
     void run(Scanner scanner) {
-        mainLoop(scanner);
+        mainLoop();
         printSet();
     }
 
-    public void mainLoop(Scanner scanner) {
-        while (true) {
-            String inputText = readTextFromUser(scanner);
+    private void mainLoop() {
+        boolean continueLoop = true;
+        do {
+            String inputText = readTextFromUser();
             if (inputText.equalsIgnoreCase(STOP)) {
-                sortCollection(scanner);
                 try {
-                    writeListToFile(fileName);
+                    sortCollection();
+                    FileWithStatsWriter.writeListToFile(participants, fileName);
+                    continueLoop = false;
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("Nie udało się zapisać statystyk do pliku");
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
                 }
-                return;
+
             } else {
                 Person person = createPerson(inputText);
                 participants.add(person);
             }
-        }
+
+        } while (continueLoop);
     }
 
-    public String readTextFromUser(Scanner scanner) {
+    private String readTextFromUser() {
         System.out.println("Podaj wynik kolejnego gracza (lub stop):");
         return scanner.nextLine();
     }
 
-    public Person createPerson(String inputLine) {
+    private Person createPerson(String inputLine) {
         String[] inputLineArray = inputLine.split(" ");
         String firstName = inputLineArray[0];
         String lastName = inputLineArray[1];
@@ -59,53 +62,35 @@ public class TournamentStats {
         }
     }
 
-    public int readSortingParameterOption(Scanner scanner) {
-        System.out.println("Po jakim parametrze posortować? (1 - imię, 2 - nazwisko, 3 - wynik)");
-        return scanner.nextInt();
+    private int readSortingParameterOption() {
+        System.out.println("Po jakim parametrze posortować? (" + SORTING_BY_FIRST_NAME + " - imię, " +
+                SORTING_BY_LAST_NAME +  " - nazwisko, " + SORTING_BY_RESULT + " - wynik)");
+        int option = scanner.nextInt();
+        scanner.nextLine();
+        return option;
     }
 
-    public int readSortingMethod(Scanner scanner) {
-        System.out.println("Sortować rosnąco czy malejąco? (1 - rosnąco, 2 - malejąco)");
-        return scanner.nextInt();
+    private int readSortingOrder() {
+        System.out.println("Sortować rosnąco czy malejąco? (" + ASCENDING_SORTING + " - rosnąco, "
+                + DESCENDING_SORTING + " - malejąco)");
+        int order = scanner.nextInt();
+        scanner.nextLine();
+        return order;
     }
 
-    public void sortCollection(Scanner scanner) {
-        int sortingParameterOption = readSortingParameterOption(scanner);
-        int sortingMethod = readSortingMethod(scanner);
-        Comparator<Person> comparator = null;
-        switch (sortingParameterOption) {
-            case SORTING_BY_FIRST_NAME -> comparator = new ParticipantsFirstNameComparator();
-            case SORTING_BY_LAST_NAME -> comparator = new ParticipantsLastNameComparator();
-            case SORTING_BY_RESULT -> comparator = new ParticipantsResultComparator();
-            default -> System.out.println("Wybrałeś zły typ sortowania");
+    private void sortCollection() {
+
+        int sortingParameterOption = readSortingParameterOption();
+        int sortingOrder = readSortingOrder();
+        Comparator<Person> comparator = switch (sortingParameterOption) {
+            case SORTING_BY_FIRST_NAME -> new ParticipantsFirstNameComparator();
+            case SORTING_BY_LAST_NAME -> new ParticipantsLastNameComparator();
+            case SORTING_BY_RESULT -> new ParticipantsResultComparator();
+            default -> throw new IllegalArgumentException("Nieprawidłowy parametr sortowania");
+        };
+        if (sortingOrder == DESCENDING_SORTING) {
+            comparator = comparator.reversed();
         }
-        if (comparator != null) {
-            sortCollectionByMethod(sortingMethod, comparator);
-        }
-    }
-
-    public void sortCollectionByMethod(int sortingMethodOption, Comparator<Person> comparator) {
         participants.sort(comparator);
-        if (sortingMethodOption == DESCENDING_SORTING) {
-            Collections.reverse(participants);
-        }
     }
-
-    public void writeListToFile(String fileName) throws IOException {
-        try (FileWriter fileWriter = new FileWriter(fileName);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        ) {
-            for (Person participant : participants) {
-                bufferedWriter.write(writePersonToCsv(participant));
-                bufferedWriter.newLine();
-            }
-        }
-
-    }
-
-    public String writePersonToCsv(Person participant) {
-        return participant.getFirstName() + " " + participant.getLastName() + ";" + participant.getResult();
-
-    }
-
 }
